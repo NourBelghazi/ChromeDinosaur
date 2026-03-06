@@ -9,6 +9,8 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
     int boardWidth = 750;
     int boardHeight = 250;
 
+    int gravity = 2;
+
     private Image cactus1;
     private Image cactus2;
     private Image cactus3;
@@ -88,10 +90,11 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
+
         if(e.getKeyCode()==KeyEvent.VK_UP){
-            velocityY=-17;
-            System.out.println("Jump");
-        }
+                velocityY=-17;
+                dinosaur.image = dinosaurJumpImage;
+            }
         if(e.getKeyCode()==KeyEvent.VK_DOWN){}
         if(e.getKeyCode()==KeyEvent.VK_RIGHT){}
         if(e.getKeyCode()==KeyEvent.VK_LEFT){}
@@ -112,5 +115,13 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
     }
     public void move(){
         dinosaur.y += velocityY;
+        if(dinosaur.y<dinosaurY){
+        velocityY+=gravity;
+        }
+        else{
+            dinosaur.y=dinosaurY;
+            dinosaur.image=dinosaurImage;
+        }
+
+        }
     }
-}
