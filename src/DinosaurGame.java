@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class DinosaurGame extends JPanel implements ActionListener{
+public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
 
     int boardWidth = 750;
     int boardHeight = 250;
@@ -25,6 +25,9 @@ public class DinosaurGame extends JPanel implements ActionListener{
     Block dinosaur;
     Timer gameLoop;
 
+    int velocityX =0;
+    int velocityY =0;
+
 
 
 
@@ -33,6 +36,8 @@ public class DinosaurGame extends JPanel implements ActionListener{
 
         setPreferredSize(new Dimension(this.boardWidth,this.boardHeight));
         setBackground(Color.BLACK);
+        setFocusable(true);
+        addKeyListener(this);
 
         dinosaurDeadImage = new ImageIcon(getClass().getResource("./images/dino-dead.png")).getImage();
         dinosaurImage = new ImageIcon(getClass().getResource("./images/dino-run.gif")).getImage();
@@ -44,14 +49,11 @@ public class DinosaurGame extends JPanel implements ActionListener{
 
         dinosaur = new Block(dinosaurImage,dinosaurX,dinosaurY, dinosaurHeight,dinosaurWidth);
         gameLoop = new Timer(1000/60, this);
+        gameLoop.start();
 
 
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
 
     class Block {
 
@@ -62,8 +64,6 @@ public class DinosaurGame extends JPanel implements ActionListener{
         int blockWidth;
         int blockHeight;
 
-        int velocityX =0;
-        int velocityY =0;
 
         public Block(Image image, int x, int y, int blockHeight, int blockWidth){
 
@@ -77,6 +77,30 @@ public class DinosaurGame extends JPanel implements ActionListener{
         }
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        move();
+        repaint();
+
+    }
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode()==KeyEvent.VK_UP){
+            velocityY=-17;
+            System.out.println("Jump");
+        }
+        if(e.getKeyCode()==KeyEvent.VK_DOWN){}
+        if(e.getKeyCode()==KeyEvent.VK_RIGHT){}
+        if(e.getKeyCode()==KeyEvent.VK_LEFT){}
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         draw(g);
@@ -85,8 +109,8 @@ public class DinosaurGame extends JPanel implements ActionListener{
     public void draw(Graphics g){
 
         g.drawImage(dinosaur.image,dinosaur.x,dinosaur.y,dinosaur.blockHeight, dinosaur.blockHeight,null);
-
-
-
+    }
+    public void move(){
+        dinosaur.y += velocityY;
     }
 }

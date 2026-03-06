@@ -18,6 +18,7 @@ public class App {
 
         frame.add(dinosaurGame);
         frame.pack();
+        dinosaurGame.requestFocus();
         frame.setVisible(true);
 
 
