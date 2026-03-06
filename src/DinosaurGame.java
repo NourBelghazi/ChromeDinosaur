@@ -40,8 +40,12 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
     Timer gameLoop;
     Timer placeCactusTimer;
 
-    int velocityX =0;
     int velocityY =0;
+
+    int cactusVelocity=20;
+
+    boolean gameOver = false;
+
 
 
 
@@ -70,6 +74,7 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
         Timer placeCactusTimer = new Timer(1500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                move();
                 placeCactus();
                 repaint();
             }
@@ -79,6 +84,9 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
 
     }
     public void placeCactus(){
+        if(gameOver){
+            return;
+        }
 
         double placeCactusChance = Math.random();
 
@@ -87,11 +95,11 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
             cactusArray.add(cactusAffiche);
         }
         if(placeCactusChance >0.60){
-            Block cactusAffiche = new Block(cactus3,cactusX,cactusY,cactusHeight,cactus3Width);
+            Block cactusAffiche = new Block(cactus2,cactusX,cactusY,cactusHeight,cactus3Width);
             cactusArray.add(cactusAffiche);
         }
         else{
-            Block cactusAffiche = new Block(cactus3,cactusX,cactusY,cactusHeight,cactus3Width);
+            Block cactusAffiche = new Block(cactus1,cactusX,cactusY,cactusHeight,cactus3Width);
             cactusArray.add(cactusAffiche);
         }
 
@@ -131,7 +139,9 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if(gameOver){
+            return;
+        }
         if(e.getKeyCode()==KeyEvent.VK_UP){
                 velocityY=(dinosaur.y==dinosaurY)?-17:0;
                 dinosaur.image = (dinosaur.y<=dinosaurY)?dinosaurJumpImage:dinosaurImage;
@@ -155,20 +165,41 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
         g.drawImage(dinosaur.image,dinosaur.x,dinosaur.y,dinosaur.blockHeight, dinosaur.blockHeight,null);
 
         for(Block cactus:cactusArray) {
-
             g.drawImage(cactus.image,cactus.x,cactus.y,cactus.blockHeight, cactus.blockHeight,null);
+
         }
 
     }
-    public void move(){
+    public boolean collision(Block block1, Block block2 ){
+        return block1.x<block2.x+ block2.blockWidth &&
+                block2.x<block1.x+ block1.blockWidth &&
+                block1.y<block2.y+ block2.blockHeight -20 &&
+                block2.x<block1.x+ block1.blockHeight -20;
+    }
+
+
+    public void move() {
+        if(gameOver){
+            return;
+        }
         dinosaur.y += velocityY;
-        if(dinosaur.y<dinosaurY){
-        velocityY+=gravity;
-        }
-        else{
-            dinosaur.y=dinosaurY;
-            dinosaur.image=dinosaurImage;
-        }
+            if (dinosaur.y < dinosaurY) {
+                velocityY += gravity;
+            } else {
+                dinosaur.y = dinosaurY;
+                dinosaur.image = dinosaurImage;
+            }
+            for (Block cactus : cactusArray) {
+                if(!collision(cactus,dinosaur)) {
+                    cactus.x -= cactusVelocity;
+
+                }
+                else{
+                    dinosaur.image=dinosaurDeadImage;
+                    gameOver = true;
+                }
+
+            }
 
         }
     }
