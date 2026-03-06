@@ -95,11 +95,11 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
             cactusArray.add(cactusAffiche);
         }
         if(placeCactusChance >0.60){
-            Block cactusAffiche = new Block(cactus2,cactusX,cactusY,cactusHeight,cactus3Width);
+            Block cactusAffiche = new Block(cactus2,cactusX,cactusY,cactusHeight,cactus2Width);
             cactusArray.add(cactusAffiche);
         }
         else{
-            Block cactusAffiche = new Block(cactus1,cactusX,cactusY,cactusHeight,cactus3Width);
+            Block cactusAffiche = new Block(cactus1,cactusX,cactusY,cactusHeight,cactus1Width);
             cactusArray.add(cactusAffiche);
         }
 
@@ -168,6 +168,7 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener{
             g.drawImage(cactus.image,cactus.x,cactus.y,cactus.blockHeight, cactus.blockHeight,null);
 
         }
+
 
     }
     public boolean collision(Block block1, Block block2 ){
