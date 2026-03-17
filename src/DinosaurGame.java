@@ -15,21 +15,27 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener 
     static final int DINO_X = 50;
     static final int CACTUS1_W = 34, CACTUS2_W = 69, CACTUS3_W = 103;
     static final int CACTUS_H = 70;
+    static final int TRACK_HEIGHT = 26;
+    static final int CLOUD_W = 92, CLOUD_H = 28;
     static final int ANIM_PERIOD = 8;
 
     private Image[] runFrames;
     private Image dinosaurDeadImage;
     private Image dinosaurJumpImage;
     private Image[] duckFrames;
-    private Image cactus1Img;
-    private Image cactus2Img;
-    private Image cactus3Img;
+    private Image cactus1Img, cactus2Img, cactus3Img;
+    private Image trackImg;
+    private Image cloudImg;
 
     int dinosaurGroundY;
     int duckGroundY;
     Block dinosaur;
 
     ArrayList<Block> obstacles = new ArrayList<>();
+    ArrayList<Block> clouds = new ArrayList<>();
+
+    int trackX1 = 0;
+    int trackX2 = BOARD_WIDTH;
 
     Timer gameLoop;
     Timer placeObstacleTimer;
@@ -61,15 +67,24 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener 
         cactus1Img = new ImageIcon(getClass().getResource("./images/cactus1.png")).getImage();
         cactus2Img = new ImageIcon(getClass().getResource("./images/cactus2.png")).getImage();
         cactus3Img = new ImageIcon(getClass().getResource("./images/cactus3.png")).getImage();
+        trackImg = new ImageIcon(getClass().getResource("./images/track.png")).getImage();
+        cloudImg = new ImageIcon(getClass().getResource("./images/cloud.png")).getImage();
 
         dinosaurGroundY = BOARD_HEIGHT - DINO_HEIGHT;
         duckGroundY = BOARD_HEIGHT - DINO_DUCK_HEIGHT;
         dinosaur = new Block(runFrames[0], DINO_X, dinosaurGroundY, DINO_WIDTH, DINO_HEIGHT);
 
+        spawnCloud();
+
         gameLoop = new Timer(1000 / 60, this);
         placeObstacleTimer = new Timer(1500, e -> placeObstacle());
         gameLoop.start();
         placeObstacleTimer.start();
+    }
+
+    void spawnCloud() {
+        int y = 30 + (int)(Math.random() * 60);
+        clouds.add(new Block(cloudImg, BOARD_WIDTH, y, CLOUD_W, CLOUD_H));
     }
 
     void placeObstacle() {
@@ -154,10 +169,18 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener 
     }
 
     void draw(Graphics g) {
+        for (Block cloud : clouds) {
+            g.drawImage(cloud.image, cloud.x, cloud.y, cloud.width, cloud.height, null);
+        }
+
+        g.drawImage(trackImg, trackX1, BOARD_HEIGHT - TRACK_HEIGHT, BOARD_WIDTH, TRACK_HEIGHT, null);
+        g.drawImage(trackImg, trackX2, BOARD_HEIGHT - TRACK_HEIGHT, BOARD_WIDTH, TRACK_HEIGHT, null);
+
         g.drawImage(dinosaur.image, dinosaur.x, dinosaur.y, dinosaur.width, dinosaur.height, null);
         for (Block obs : obstacles) {
             g.drawImage(obs.image, obs.x, obs.y, obs.width, obs.height, null);
         }
+
         g.setColor(Color.BLACK);
         g.setFont(new Font("Courier", Font.PLAIN, 32));
         if (gameOver) {
@@ -171,20 +194,33 @@ public class DinosaurGame extends JPanel implements ActionListener, KeyListener 
         if (gameOver) return;
 
         animTick++;
-        int groundY = isDucking ? duckGroundY : dinosaurGroundY;
 
+        trackX1 -= speed;
+        trackX2 -= speed;
+        if (trackX1 + BOARD_WIDTH <= 0) trackX1 = trackX2 + BOARD_WIDTH;
+        if (trackX2 + BOARD_WIDTH <= 0) trackX2 = trackX1 + BOARD_WIDTH;
+
+        ArrayList<Block> cloudsToRemove = new ArrayList<>();
+        for (Block cloud : clouds) {
+            cloud.x -= speed / 2;
+            if (cloud.x + cloud.width < 0) cloudsToRemove.add(cloud);
+        }
+        clouds.removeAll(cloudsToRemove);
+        if (clouds.isEmpty() || clouds.get(clouds.size() - 1).x < BOARD_WIDTH - 200) {
+            spawnCloud();
+        }
+
+        int groundY = isDucking ? duckGroundY : dinosaurGroundY;
         dinosaur.y += velocityY;
         if (dinosaur.y < groundY) {
             velocityY += GRAVITY;
         } else {
             dinosaur.y = groundY;
             velocityY = 0;
-            if (!gameOver) {
-                if (isDucking) {
-                    dinosaur.image = duckFrames[(animTick / ANIM_PERIOD) % 2];
-                } else {
-                    dinosaur.image = runFrames[(animTick / ANIM_PERIOD) % 2];
-                }
+            if (isDucking) {
+                dinosaur.image = duckFrames[(animTick / ANIM_PERIOD) % 2];
+            } else {
+                dinosaur.image = runFrames[(animTick / ANIM_PERIOD) % 2];
             }
         }
 
