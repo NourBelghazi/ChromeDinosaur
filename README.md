@@ -1,6 +1,6 @@
 # 🦕 Chrome Dinosaur (Java)
 
-A faithful **Chrome Dinosaur clone developed in Java using Swing**, featuring all classic mechanics: run animation, ducking, animated birds, big cacti, scrolling track, clouds, progressive difficulty, and a persistent high score.
+A faithful **Chrome Dinosaur clone developed in Java using Swing**, featuring all classic mechanics: run animation, ducking, animated birds, big cacti, scrolling track, clouds, progressive difficulty, and a persistent high score
 
 ---
 
